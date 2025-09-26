@@ -26,8 +26,7 @@
       </h3>
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-xl font-bold text-blue-600">€{{ product.price.toFixed(2) }}</p>
-          <p class="text-xs text-gray-500 mt-1">Free shipping</p>
+          <p class="text-xl font-bold text-blue-600">RM{{ product.price.toFixed(2) }}</p>
         </div>
         <button class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-2.5 rounded-xl hover:from-blue-600 hover:to-blue-700 transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
