@@ -10,7 +10,7 @@ export default defineConfig({
   plugins: [
     vue(),
     vueDevTools(),
-  ],
+  ], base: process.env.NODE_ENV === 'production' ? '/Product-Listing-Page/' : '/',
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
