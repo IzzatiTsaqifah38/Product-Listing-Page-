@@ -9,10 +9,6 @@ permissions:
   pages: write
   id-token: write
 
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
 jobs:
   build-and-deploy:
     environment:
@@ -25,20 +21,28 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Setup Node.js (LTS)
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '20'  
-        cache: 'npm'  
+        node-version: '20'
+        cache: 'npm'
 
-    - name: Install dependencies
+    - name: Clean installation with npm bug fix
       run: |
-        # Clean install to avoid npm bugs
-        rm -rf node_modules
-        npm install --no-optional
+        # Remove existing files that might cause the bug
+        rm -rf node_modules package-lock.json
+        
+        # Install with specific flags to avoid optional dependencies bug
+        npm install --no-optional --no-audit --no-fund --prefer-offline
+        
+        # Force rebuild native modules
+        npm rebuild
 
     - name: Build project
-      run: npm run build
+      run: |
+        # Set environment variable to skip optional dependencies
+        export NPM_CONFIG_OPTIONAL=false
+        npm run build
 
     - name: Setup Pages
       uses: actions/configure-pages@v4
