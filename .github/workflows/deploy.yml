@@ -5,34 +5,29 @@ on:
     branches: [ main, master ]
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.19'
+      - name: Clean install
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install
 
-    - name: Setup Node.js 18 (more stable)
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
+      - name: Build project
+        run: npm run build
 
-    - name: Install dependencies with bug fix
-      run: |
-        # Force clean installation
-        rm -rf node_modules package-lock.json
-        npm install --no-optional --legacy-peer-deps
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
 
-    - name: Build project
-      run: npm run build
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+             path: ./dist
 
-    - name: Setup Pages
-      uses: actions/configure-pages@v4
-
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: ./dist
-
-    - name: Deploy to GitHub Pages
-      uses: actions/deploy-pages@v4
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
