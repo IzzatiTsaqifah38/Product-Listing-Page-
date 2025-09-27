@@ -4,28 +4,41 @@ on:
   push:
     branches: [ main, master ]
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
     runs-on: ubuntu-latest
     
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Setup Node.js
+    - name: Setup Node.js (LTS)
       uses: actions/setup-node@v4
       with:
-        node-version: '21'
-        cache: 'yarn'  # Change to yarn cache
+        node-version: '20'  
+        cache: 'npm'  
 
-    - name: Install Yarn
-      run: npm install -g yarn
-
-    - name: Install dependencies with Yarn
-      run: yarn install --ignore-optional
+    - name: Install dependencies
+      run: |
+        # Clean install to avoid npm bugs
+        rm -rf node_modules
+        npm install --no-optional
 
     - name: Build project
-      run: yarn build
+      run: npm run build
 
     - name: Setup Pages
       uses: actions/configure-pages@v4
@@ -36,4 +49,5 @@ jobs:
         path: ./dist
 
     - name: Deploy to GitHub Pages
+      id: deployment
       uses: actions/deploy-pages@v4
