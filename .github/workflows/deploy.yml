@@ -5,11 +5,11 @@ on:
     branches: [ main, master ]
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v4
 
     - name: Setup Node.js
@@ -17,11 +17,19 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Install dependencies
+    - name: Clean install with npm bug workaround
       run: |
-        # Clean any cached modules and do fresh install
-        rm -rf node_modules
-        npm install --legacy-peer-deps
+        # Remove existing files completely
+        rm -rf node_modules package-lock.json
+        
+        # Clear npm cache
+        npm cache clean --force
+        
+        # Install with flags to avoid the Rollup bug
+        npm install --no-optional --legacy-peer-deps --force
+        
+        # Explicitly install Rollup if needed
+        npm install rollup@^4.52.2 --no-optional
 
     - name: Build project
       run: npm run build
