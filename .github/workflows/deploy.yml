@@ -12,20 +12,20 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Setup Node.js 22
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '22'  
-        cache: 'npm'
+        node-version: '21'
+        cache: 'yarn'  # Change to yarn cache
 
-    - name: Clear npm cache and reinstall
-      run: |
-        npm cache clean --force
-        rm -rf node_modules package-lock.json
-        npm install --no-optional --force
+    - name: Install Yarn
+      run: npm install -g yarn
+
+    - name: Install dependencies with Yarn
+      run: yarn install --ignore-optional
 
     - name: Build project
-      run: npm run build
+      run: yarn build
 
     - name: Setup Pages
       uses: actions/configure-pages@v4
@@ -36,13 +36,4 @@ jobs:
         path: ./dist
 
     - name: Deploy to GitHub Pages
-      uses: actions/deploy-pages@v4
-
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: ./dist
-
-    - name: Deploy to GitHub Pages
-      id: deployment
       uses: actions/deploy-pages@v4
