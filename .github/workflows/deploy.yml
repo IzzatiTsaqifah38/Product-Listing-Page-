@@ -12,24 +12,16 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Setup Node.js
+    - name: Setup Node.js 18 (more stable)
       uses: actions/setup-node@v4
       with:
-        node-version: '20'
+        node-version: '18'
 
-    - name: Clean install with npm bug workaround
+    - name: Install dependencies with bug fix
       run: |
-        # Remove existing files completely
+        # Force clean installation
         rm -rf node_modules package-lock.json
-        
-        # Clear npm cache
-        npm cache clean --force
-        
-        # Install with flags to avoid the Rollup bug
-        npm install --no-optional --legacy-peer-deps --force
-        
-        # Explicitly install Rollup if needed
-        npm install rollup@^4.52.2 --no-optional
+        npm install --no-optional --legacy-peer-deps
 
     - name: Build project
       run: npm run build
