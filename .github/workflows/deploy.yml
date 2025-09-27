@@ -4,45 +4,30 @@ on:
   push:
     branches: [ main, master ]
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
 jobs:
   build-and-deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    
     runs-on: ubuntu-latest
     
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 8
+
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '20'
-        cache: 'npm'
+        cache: 'pnpm'
 
-    - name: Clean installation with npm bug fix
-      run: |
-        # Remove existing files that might cause the bug
-        rm -rf node_modules package-lock.json
-        
-        # Install with specific flags to avoid optional dependencies bug
-        npm install --no-optional --no-audit --no-fund --prefer-offline
-        
-        # Force rebuild native modules
-        npm rebuild
+    - name: Install dependencies with pnpm
+      run: pnpm install
 
     - name: Build project
-      run: |
-        # Set environment variable to skip optional dependencies
-        export NPM_CONFIG_OPTIONAL=false
-        npm run build
+      run: pnpm run build
 
     - name: Setup Pages
       uses: actions/configure-pages@v4
@@ -53,5 +38,4 @@ jobs:
         path: ./dist
 
     - name: Deploy to GitHub Pages
-      id: deployment
       uses: actions/deploy-pages@v4
